@@ -1,6 +1,8 @@
 package jkind.translation.compound;
 
 import jkind.lustre.Node;
+import jkind.lustre.Program;
+import jkind.lustre.builders.ProgramBuilder;
 
 /**
  * Flatten arrays and records to scalars
@@ -8,13 +10,15 @@ import jkind.lustre.Node;
  * Assumption: All node calls have been inlined.
  */
 public class FlattenCompoundTypes {
-	public static Node node(Node node) {
-		node = RemoveNonConstantArrayIndices.node(node);
-		node = RemoveArrayUpdates.node(node);
-		node = RemoveRecordUpdates.node(node);
-		node = FlattenCompoundComparisons.node(node);
+	public static Program program(Program program) {
+		Node node = program.getMainNode();
+		node = RemoveNonConstantArrayIndices.node(node, program);
+		node = RemoveArrayUpdates.node(node, program);
+		node = RemoveRecordUpdates.node(node, program);
+		node = FlattenCompoundComparisons.node(node, program);
 		node = FlattenCompoundVariables.node(node);
-		node = FlattenCompoundExpressions.node(node);
-		return node;
+		program = new ProgramBuilder(program).clearNodes().addNode(node).build();
+		program = FlattenCompoundExpressions.program(program);
+		return program;
 	}
 }

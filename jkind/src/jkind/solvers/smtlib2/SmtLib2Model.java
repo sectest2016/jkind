@@ -1,9 +1,11 @@
 package jkind.solvers.smtlib2;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jkind.lustre.Function;
 import jkind.lustre.NamedType;
 import jkind.lustre.Type;
 import jkind.lustre.values.IntegerValue;
@@ -17,8 +19,8 @@ import jkind.util.Util;
 public class SmtLib2Model extends Model {
 	private final Map<String, Sexp> values = new HashMap<>();
 
-	public SmtLib2Model(Map<String, Type> varTypes) {
-		super(varTypes);
+	public SmtLib2Model(Map<String, Type> varTypes, List<Function> functions) {
+		super(varTypes, functions);
 	}
 
 	public void addValue(String id, Sexp sexp) {

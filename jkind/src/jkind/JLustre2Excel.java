@@ -5,7 +5,6 @@ import java.util.TreeSet;
 
 import jkind.analysis.StaticAnalyzer;
 import jkind.lustre.EnumType;
-import jkind.lustre.Node;
 import jkind.lustre.Program;
 import jkind.translation.Node2Excel;
 import jkind.translation.Translate;
@@ -23,9 +22,9 @@ public class JLustre2Excel {
 			StaticAnalyzer.check(program, SolverOption.Z3);
 			ensureUniqueEnumValues(program);
 
-			Node main = Translate.translate(program);
+			program = Translate.translate(program);
 			String outFilename = filename + ".xls";
-			new Node2Excel().convert(main, outFilename);
+			new Node2Excel().convert(program.getMainNode(), outFilename);
 			System.out.println("Wrote " + outFilename);
 		} catch (Exception e) {
 			e.printStackTrace();

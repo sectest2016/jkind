@@ -1,0 +1,54 @@
+function f(x: int) returns (y: int);
+function min() returns (y: int);
+
+node main(in: int) returns (ok: bool);
+var
+  pin: int;
+  sequence: int;
+  sumsq: int;
+  sumin: int;
+  ssize: int;
+  interesting_length: bool;
+  non_sequential: bool;
+  complete: bool;
+let
+
+  assert(  in < 0);
+  assert(-128 <= in);
+
+  --- We do this to keep the solutions
+  --- from being completely degenerate.
+  non_sequential = false -> ((in < (pre in)) or (pre non_sequential));
+
+  --- Here we establish some arbitrary minimum
+  --- and say that all values are above it.  This
+  --- ensure that our sums are always increasing.
+  assert(min() <= in);
+
+  -- Bias our input stream by the arbitrary minimum to
+  -- generate a sequence of positive values
+  pin = in - min();
+
+  -- This assertion ensures that our sequence values are unique
+  sequence = 0 -> (pre sequence) + 1;
+
+  assert(f(pin) = 0 - sequence);
+ 
+  -- The complete predicate ensures that the sequence is complete
+  -- by comparing the sum of the positive input value sequence with
+  -- the sum of a simple increasing sequence.
+  sumsq = (sequence -> sequence + (pre sumsq));
+  sumin = (pin -> pin + (pre sumin));
+  complete = (sumsq = sumin);
+
+  -- We want an example of an interesting length
+  ssize = 1 -> 1 + (pre ssize);
+  interesting_length = (ssize = 3);
+ 
+  ok = (not (interesting_length and non_sequential and complete));
+
+  -- JFuzz will actually negates this property so that the counterexample
+  -- satisfies the OK predicate.
+  --%PROPERTY ok;
+
+tel

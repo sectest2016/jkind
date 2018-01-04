@@ -2,24 +2,7 @@ package jkind.solvers.smtinterpol;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
-
-import jkind.JKindException;
-import jkind.lustre.EnumType;
-import jkind.lustre.NamedType;
-import jkind.lustre.SubrangeIntType;
-import jkind.lustre.Type;
-import jkind.lustre.values.BooleanValue;
-import jkind.lustre.values.IntegerValue;
-import jkind.lustre.values.RealValue;
-import jkind.lustre.values.Value;
-import jkind.sexp.Cons;
-import jkind.sexp.Sexp;
-import jkind.sexp.Symbol;
-import jkind.util.BigFraction;
-import jkind.util.Util;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.List;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
@@ -30,13 +13,27 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
+import jkind.JKindException;
+import jkind.lustre.EnumType;
+import jkind.lustre.Function;
+import jkind.lustre.NamedType;
+import jkind.lustre.SubrangeIntType;
+import jkind.lustre.Type;
+import jkind.lustre.VarDecl;
+import jkind.lustre.values.BooleanValue;
+import jkind.lustre.values.IntegerValue;
+import jkind.lustre.values.RealValue;
+import jkind.lustre.values.Value;
+import jkind.sexp.Cons;
+import jkind.sexp.Sexp;
+import jkind.sexp.Symbol;
+import jkind.util.BigFraction;
+import jkind.util.SexpUtil;
+import jkind.util.Util;
 
 public class SmtInterpolUtil {
 	public static Script getScript(String scratchBase) {
-		Logger logger = Logger.getRootLogger();
-		logger.setLevel(Level.OFF);
-
-		Script baseScript = new SMTInterpol(logger);
+		Script baseScript = new SMTInterpol();
 		if (scratchBase == null) {
 			return baseScript;
 		}
@@ -155,5 +152,20 @@ public class SmtInterpolUtil {
 		}
 
 		throw new JKindException("Unhandled constant in term to value conversion: " + ct);
+	}
+
+	public static Sort[] getSorts(Script script, List<VarDecl> vars) {
+		Sort[] sorts = new Sort[vars.size()];
+		for (int i = 0; i < vars.size(); i++) {
+			sorts[i] = getSort(script, vars.get(i).type);
+		}
+		return sorts;
+	}
+
+	public static void declareFunction(Script script, Function function) {
+		String encodedName = SexpUtil.encodeFunction(function.id).toString();
+		Sort[] inputs = getSorts(script, function.inputs);
+		Sort output = getSort(script, function.outputs.get(0).type);
+		script.declareFun(encodedName, inputs, output);
 	}
 }

@@ -49,12 +49,14 @@ public abstract class SolverBasedEngine extends Engine {
 	protected void initializeSolver() {
 		solver = getSolver();
 		solver.initialize();
+		solver.declare(spec.functions);
 		solver.define(spec.getTransitionRelation());
 		solver.define(new VarDecl(INIT.str, NamedType.BOOL));
 	}
 
 	protected Solver getSolver() {
-		return SolverUtil.getSolver(settings.solver, getScratchBase(), spec.node);
+		boolean hasFunctions = !spec.functions.isEmpty();
+		return SolverUtil.getSolver(settings.solver, getScratchBase(), spec.node, hasFunctions);
 	}
 
 	/** Utility */

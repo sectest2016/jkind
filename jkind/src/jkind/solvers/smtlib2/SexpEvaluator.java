@@ -38,7 +38,7 @@ public class SexpEvaluator {
 			return BooleanValue.TRUE;
 		} else if (sym.equals("false")) {
 			return BooleanValue.FALSE;
-		} else if (!Character.isDigit(sym.charAt(0))) {
+		} else if (!Character.isDigit(sym.charAt(0)) && sym.charAt(0) != '-') {
 			return model.getValue(sym);
 		} else if (sym.contains("/")) {
 			return Util.parseValue("real", sym);

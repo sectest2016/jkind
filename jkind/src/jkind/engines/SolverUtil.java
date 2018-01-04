@@ -1,8 +1,9 @@
 package jkind.engines;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jkind.JKindException;
 import jkind.SolverOption;
@@ -19,10 +20,12 @@ import jkind.solvers.yices2.Yices2Solver;
 import jkind.solvers.z3.Z3Solver;
 
 public class SolverUtil {
-	public static Solver getSolver(SolverOption solverOption, String scratchBase, Node node) {
+	public static Solver getSolver(SolverOption solverOption, String scratchBase, Node node,
+			boolean uninterpretedFunctionSupport) {
 		switch (solverOption) {
 		case YICES:
-			return new YicesSolver(scratchBase, YicesArithOnlyCheck.check(node));
+			boolean arithOnly = YicesArithOnlyCheck.check(node) && !uninterpretedFunctionSupport;
+			return new YicesSolver(scratchBase, arithOnly);
 		case CVC4:
 			return new Cvc4Solver(scratchBase);
 		case Z3:
@@ -39,7 +42,7 @@ public class SolverUtil {
 
 	public static Solver getBasicSolver(SolverOption solverOption) {
 		Node emptyNode = new NodeBuilder("empty").build();
-		return getSolver(solverOption, null, emptyNode);
+		return getSolver(solverOption, null, emptyNode, false);
 	}
 
 	public static boolean solverIsAvailable(SolverOption solverOption) {
@@ -52,8 +55,6 @@ public class SolverUtil {
 	}
 
 	public static List<SolverOption> availableSolvers() {
-		return Arrays.stream(SolverOption.values()).filter(x -> solverIsAvailable(x))
-				.collect(Collectors.toList());
+		return Arrays.stream(SolverOption.values()).filter(x -> solverIsAvailable(x)).collect(toList());
 	}
-
 }

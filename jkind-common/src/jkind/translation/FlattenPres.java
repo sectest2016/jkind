@@ -7,10 +7,12 @@ import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.Node;
+import jkind.lustre.Program;
 import jkind.lustre.UnaryExpr;
 import jkind.lustre.UnaryOp;
 import jkind.lustre.VarDecl;
 import jkind.lustre.builders.NodeBuilder;
+import jkind.lustre.builders.ProgramBuilder;
 import jkind.lustre.visitors.TypeAwareAstMapVisitor;
 
 /**
@@ -18,8 +20,13 @@ import jkind.lustre.visitors.TypeAwareAstMapVisitor;
  * 'pre' operators. This is done by introducing new local variables.
  */
 public class FlattenPres extends TypeAwareAstMapVisitor {
-	public static Node node(Node node) {
-		return new FlattenPres().visit(node);
+	public FlattenPres(Program program) {
+		super(program);
+	}
+
+	public static Program program(Program program) {
+		Node node = new FlattenPres(program).visit(program.getMainNode());
+		return new ProgramBuilder(program).clearNodes().addNode(node).build();
 	}
 
 	private List<VarDecl> newLocals = new ArrayList<>();

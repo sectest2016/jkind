@@ -1,0 +1,70 @@
+
+function min_i() returns (y: int);
+function min_r() returns (y: real);
+function f_i(x: int) returns (y: int);
+function f_r(x: real) returns (y: real);
+
+
+node main(in_i: int; in_r: real) returns (ok: bool);
+var
+  pin_r: real;
+  pin_i: int;
+  sequence_i: int;
+  sequence_r: real;
+  sumsq_r: real;
+  sumin_r: real;
+  sumsq_i: int;
+  sumin_i: int;
+  ssize: int;
+  complete: bool;
+  interesting_length: bool;
+  non_sequential: bool;
+let
+
+  assert(  in_r < 0.0);
+  assert(-128.0 <= in_r);
+  assert(  in_i < 0);
+  assert(-128 <= in_i);
+
+  --- We do this to keep the solutions
+  --- from being completely degenerate.
+  non_sequential = false -> (((in_r < (pre in_r)) and (in_i < (pre in_i))) or (pre non_sequential));
+
+  --- Here we establish some arbitrary minimum
+  --- and say that all values are above it.  This
+  --- ensure that our sums are always increasing.
+  assert(min_i() <= in_i);
+  assert(min_r() <= in_r);
+
+  -- Bias our input stream by the arbitrary minimum to
+  -- generate a sequence_r of positive values
+  pin_i = in_i - min_i();
+  pin_r = in_r - min_r();
+
+  -- This assertion ensures that our sequence values are unique
+  sequence_r = 0.0 -> (pre sequence_r) + 1.0;
+  sequence_i = 0 -> (pre sequence_i) + 1;
+
+  assert(f_r(pin_r) = sequence_r);
+  assert(f_i(pin_i) = sequence_i);
+  
+  -- The complete predicate ensures that the sequence is complete
+  -- by comparing the sum of the positive input value sequence with
+  -- the sum of a simple increasing sequence.
+  sumsq_r = (sequence_r -> sequence_r + (pre sumsq_r));
+  sumin_r = (pin_r -> pin_r + (pre sumin_r));
+  sumsq_i = (sequence_i -> sequence_i + (pre sumsq_i));
+  sumin_i = (pin_i -> pin_i + (pre sumin_i));
+  complete = ((sumsq_r = sumin_r) and (sumsq_i = sumin_i));
+
+  -- We want an example of an interesting length
+  ssize = 1 -> 1 + (pre ssize);
+  interesting_length = (ssize = 3);
+ 
+  ok = (not (interesting_length and non_sequential and complete));
+
+  -- JFuzz will actually negates this property so that the counterexample
+  -- satisfies the OK predicate.
+  --%PROPERTY ok;
+
+tel

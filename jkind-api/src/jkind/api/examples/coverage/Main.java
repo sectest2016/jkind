@@ -27,7 +27,7 @@ public class Main {
 		String filename = args[0];
 		Program program = parseLustre(new ANTLRFileStream(filename));
 		
-		ExtractorVisitor visitor = new ExtractorVisitor();
+		ExtractorVisitor visitor = new ExtractorVisitor(program);
 		program = visitor.visit(program);
 		program = SubrangeFixVisitor.fix(program);
 		

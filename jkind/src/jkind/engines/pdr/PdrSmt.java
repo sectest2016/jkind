@@ -9,8 +9,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uni_freiburg.informatik.ultimate.logic.Annotation;
+import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.Logics;
+import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.QuotedObject;
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import jkind.engines.StopException;
 import jkind.lustre.Expr;
+import jkind.lustre.Function;
 import jkind.lustre.Node;
 import jkind.lustre.Type;
 import jkind.lustre.VarDecl;
@@ -22,14 +31,6 @@ import jkind.solvers.smtinterpol.Subst;
 import jkind.solvers.smtinterpol.Term2Expr;
 import jkind.translation.Relation;
 import jkind.util.StreamIndex;
-import de.uni_freiburg.informatik.ultimate.logic.Annotation;
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.Logics;
-import de.uni_freiburg.informatik.ultimate.logic.Model;
-import de.uni_freiburg.informatik.ultimate.logic.QuotedObject;
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
-import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 
 public class PdrSmt extends ScriptUser {
 	private final List<Frame> F;
@@ -49,7 +50,7 @@ public class PdrSmt extends ScriptUser {
 
 	private final NameGenerator abstractAssertions = new NameGenerator("abstract");
 
-	public PdrSmt(Node node, List<Frame> F, String property, String scratchBase) {
+	public PdrSmt(Node node, List<Function> functions, List<Frame> F, String property, String scratchBase) {
 		super(SmtInterpolUtil.getScript(scratchBase));
 		this.F = F;
 
@@ -58,6 +59,8 @@ public class PdrSmt extends ScriptUser {
 		script.setOption(":simplify-interpolants", true);
 		script.setLogic(Logics.QF_UFLIRA);
 		script.setOption(":verbosity", 2);
+
+		declareFunctions(functions);
 
 		Lustre2Term lustre2Term = new Lustre2Term(script, node);
 		this.varDecls = lustre2Term.getVariables();
@@ -76,6 +79,12 @@ public class PdrSmt extends ScriptUser {
 
 		addPredicates(PredicateCollector.collect(I));
 		addPredicates(PredicateCollector.collect(P));
+	}
+
+	private void declareFunctions(List<Function> functions) {
+		for (Function function : functions) {
+			SmtInterpolUtil.declareFunction(script, function);
+		}
 	}
 
 	private void assertAbstract(Term t) {
@@ -105,8 +114,7 @@ public class PdrSmt extends ScriptUser {
 			ApplicationTerm at = (ApplicationTerm) v;
 			return at.getFunction().getName();
 		} else {
-			throw new IllegalArgumentException(
-					"Unexpected variable type: " + v.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unexpected variable type: " + v.getClass().getSimpleName());
 		}
 	}
 
@@ -341,6 +349,7 @@ public class PdrSmt extends ScriptUser {
 				result.putValue(name, value);
 			}
 		}
+
 		return result;
 	}
 

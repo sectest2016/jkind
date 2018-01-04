@@ -31,10 +31,20 @@ public class CounterexampleFormatter {
 	}
 
 	private String footer() {
+		List<FunctionTable> funcTables = cex.getFunctionTables();
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(NEWLINE);
+		sb.append("FUNCTIONS");
+		for(FunctionTable funcTable : funcTables){
+			sb.append(NEWLINE);
+			sb.append(funcTable.toString());
+		}
+		
 		if (truncated) {
-			return NEWLINE + " * display value has been truncated" + NEWLINE;
+			return NEWLINE + " * display value has been truncated" + NEWLINE + sb.toString();
 		} else {
-			return "";
+			return sb.toString();
 		}
 	}
 

@@ -12,17 +12,18 @@ public class SimpleModel extends Model {
 	private final Map<String, Value> values = new HashMap<>();
 
 	public SimpleModel() {
-		super(Collections.emptyMap());
+		super(Collections.emptyMap(), Collections.emptyList());
 	}
 
 	public SimpleModel(Model other) {
-		super(Collections.emptyMap());
+		super(Collections.emptyMap(), Collections.emptyList());
 		for (String var : other.getVariableNames()) {
 			StreamIndex si = StreamIndex.decode(var);
 			if (si != null) {
 				putValue(si, other.getValue(var));
 			}
 		}
+		addFunctionTables(other.getFunctionTables());
 	}
 
 	public void putValue(StreamIndex si, Value value) {

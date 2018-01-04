@@ -13,6 +13,8 @@ public class ModelSlicer {
 				sliced.putValue(si, original.getValue(var));
 			}
 		}
+		sliced.addFunctionTables(original.getFunctionTables());
+
 		return sliced;
 	}
 }

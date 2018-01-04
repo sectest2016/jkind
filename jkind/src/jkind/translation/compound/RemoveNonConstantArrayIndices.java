@@ -15,6 +15,7 @@ import jkind.lustre.Expr;
 import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.IntExpr;
 import jkind.lustre.Node;
+import jkind.lustre.Program;
 import jkind.lustre.Type;
 import jkind.lustre.values.IntegerValue;
 import jkind.lustre.visitors.TypeAwareAstMapVisitor;
@@ -27,8 +28,12 @@ import jkind.translation.DefaultValueVisitor;
  * Assumption: All node calls have been inlined.
  */
 public class RemoveNonConstantArrayIndices extends TypeAwareAstMapVisitor {
-	public static Node node(Node node) {
-		return new RemoveNonConstantArrayIndices().visit(node);
+	public RemoveNonConstantArrayIndices(Program program) {
+		super(program);
+	}
+
+	public static Node node(Node node, Program program) {
+		return new RemoveNonConstantArrayIndices(program).visit(node);
 	}
 
 	private boolean isConstant(Expr e) {

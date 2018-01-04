@@ -22,8 +22,8 @@ public class JRealizability {
 			StaticAnalyzer.check(program, SolverOption.Z3);
 			checkRealizablitityQuery(program);
 
-			Node main = Translate.translate(program);
-			Specification spec = new Specification(main);
+			program = Translate.translate(program);
+			Specification spec = new Specification(program);
 			int exitCode = new RealizabilityDirector(settings, spec).run();
 			System.exit(exitCode); // Kills all threads
 		} catch (Throwable t) {

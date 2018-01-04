@@ -2,9 +2,11 @@ package jkind.solvers.yices;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jkind.lustre.Function;
 import jkind.lustre.Type;
 import jkind.lustre.values.Value;
 import jkind.solvers.Model;
@@ -14,8 +16,8 @@ public class YicesModel extends Model {
 	private final Map<String, String> aliases = new HashMap<>();
 	private final Map<String, Value> values = new HashMap<>();
 
-	public YicesModel(Map<String, Type> varTypes) {
-		super(varTypes);
+	public YicesModel(Map<String, Type> varTypes, List<Function> functions) {
+		super(varTypes, functions);
 	}
 
 	public void addAlias(String from, String to) {

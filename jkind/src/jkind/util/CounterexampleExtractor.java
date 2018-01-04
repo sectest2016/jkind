@@ -14,7 +14,7 @@ public class CounterexampleExtractor {
 	public static Counterexample extract(Specification spec, int k, Model model) {
 		return new CounterexampleExtractor(spec).extractCounterexample(k, model);
 	}
-	
+
 	private final Specification spec;
 
 	private CounterexampleExtractor(Specification spec) {
@@ -31,13 +31,14 @@ public class CounterexampleExtractor {
 				signal.putValue(si.getIndex(), value);
 			}
 		}
+		cex.addFunctionTable(model.getFunctionTables().values());
 		return cex;
 	}
-	
+
 	private boolean isInternal(String stream) {
 		return stream.startsWith("%");
 	}
-	
+
 	private Value convert(String base, Value value) {
 		Type type = spec.typeMap.get(base);
 		if (type instanceof EnumType && value != null) {
