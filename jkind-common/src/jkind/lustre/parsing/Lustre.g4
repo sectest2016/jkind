@@ -16,7 +16,7 @@ node:
 ;
 
 function:
-  'function' ID '(' input=varDeclList? ')'
+  'function' eID '(' input=varDeclList? ')'
   'returns' '(' output=varDeclList? ')' ';'
 ;
 
@@ -58,7 +58,7 @@ expr: ID                                                       # idExpr
     | REAL                                                     # realExpr
     | BOOL                                                     # boolExpr
     | op=('real' | 'floor') '(' expr ')'                       # castExpr
-    | ID '(' (expr (',' expr)*)? ')'                           # callExpr
+    | eID '(' (expr (',' expr)*)? ')'                          # callExpr
     | 'condact' '(' expr (',' expr)+ ')'                       # condactExpr
     | expr '.' ID                                              # recordAccessExpr
     | expr '{' ID ':=' expr '}'                                # recordUpdateExpr

@@ -254,10 +254,6 @@ public class Util {
 		return a.subtract(a.mod(b)).divide(b);
 	}
 
-	public static String getBaseFunctionName(String name) {
-		return name.substring(0, name.indexOf('.'));
-	}
-
 	public static <T> List<T> safeList(Collection<? extends T> original) {
 		if (original == null) {
 			return Collections.emptyList();

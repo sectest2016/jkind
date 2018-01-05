@@ -8,6 +8,7 @@ import jkind.jlustre2kind.ObfuscateIdsVisitor;
 import jkind.lustre.Node;
 import jkind.lustre.Program;
 import jkind.lustre.builders.NodeBuilder;
+import jkind.lustre.builders.ProgramBuilder;
 import jkind.slicing.DependencyMap;
 import jkind.slicing.LustreSlicer;
 import jkind.translation.RemoveEnumTypes;
@@ -31,20 +32,22 @@ public class JLustre2Kind {
 			program = Translate.translate(program);
 			Node main = program.getMainNode();
 			main = RemoveEnumTypes.node(main);
-			DependencyMap dependencyMap = new DependencyMap(main, main.properties);
-			main = LustreSlicer.slice(main, dependencyMap);
+			main = LustreSlicer.slice(main, new DependencyMap(main, main.properties));
 
 			if (settings.encode) {
 				main = new KindEncodeIdsVisitor().visit(main);
 			}
+			
 			if (settings.obfuscate) {
 				main = new ObfuscateIdsVisitor().visit(main);
 				main = new NodeBuilder(main).setId("main").build();
 			}
+			
+			program = new ProgramBuilder(program).clearNodes().addNode(main).build();
 			if (settings.stdout) {
-				System.out.println(main.toString());
+				System.out.println(program.toString());
 			} else {
-				Util.writeToFile(main.toString(), new File(outFilename));
+				Util.writeToFile(program.toString(), new File(outFilename));
 				System.out.println("Wrote " + outFilename);
 			}
 		} catch (Throwable t) {

@@ -2,6 +2,7 @@ package jkind.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -41,11 +42,11 @@ public class CounterexampleFormatter {
 	}
 
 	private String functions() {
-		List<FunctionTable> functionTables = cex.getFunctionTables();
-		if (functionTables.isEmpty()) {
+		if (cex.getFunctionTables().isEmpty()) {
 			return "";
 		}
-
+		
+		List<FunctionTable> functionTables = sortFunctions(cex.getFunctionTables());
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(NEWLINE);
@@ -57,6 +58,17 @@ public class CounterexampleFormatter {
 			}
 		}
 		return sb.toString();
+	}
+
+	private List<FunctionTable> sortFunctions(List<FunctionTable> functionTables) {
+		List<FunctionTable> result = new ArrayList<>(functionTables);
+		result.sort(new Comparator<FunctionTable>() {
+			@Override
+			public int compare(FunctionTable t1, FunctionTable t2) {
+				return new StringNaturalOrdering().compare(t1.getName(), t2.getName());
+			}
+		});
+		return result;
 	}
 
 	private List<List<String>> getContent() {

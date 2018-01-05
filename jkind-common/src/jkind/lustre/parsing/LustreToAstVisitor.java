@@ -142,7 +142,7 @@ public class LustreToAstVisitor extends LustreBaseVisitor<Object> {
 	}
 
 	public Function function(FunctionContext ctx) {
-		String id = ctx.ID().getText();
+		String id = eid(ctx.eID());
 		List<VarDecl> inputs = varDecls(ctx.input);
 		List<VarDecl> outputs = varDecls(ctx.output);
 		functionNames.add(id);
@@ -376,7 +376,7 @@ public class LustreToAstVisitor extends LustreBaseVisitor<Object> {
 
 	@Override
 	public Expr visitCallExpr(CallExprContext ctx) {
-		String name = ctx.ID().getText();
+		String name = eid(ctx.eID());
 		List<Expr> args = new ArrayList<>();
 		for (ExprContext arg : ctx.expr()) {
 			args.add(expr(arg));

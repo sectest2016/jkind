@@ -1,7 +1,5 @@
 package jkind.solvers.yices;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +19,8 @@ import jkind.solvers.yices.YicesParser.SatResultContext;
 import jkind.solvers.yices.YicesParser.UnsatCoreContext;
 import jkind.solvers.yices.YicesParser.UnsatResultContext;
 import jkind.solvers.yices.YicesParser.VariableContext;
+import jkind.util.FunctionTable;
 import jkind.util.FunctionTableRow;
-import jkind.util.SexpUtil;
 import jkind.util.Util;
 
 public class ResultExtractorListener extends YicesBaseListener {
@@ -31,12 +29,10 @@ public class ResultExtractorListener extends YicesBaseListener {
 	private List<Symbol> unsatCore;
 	private final Map<String, Type> varTypes;
 	private final List<Function> functions;
-	private final Map<String, Function> functionMap;
 
 	public ResultExtractorListener(Map<String, Type> varTypes, List<Function> functions) {
 		this.varTypes = varTypes;
 		this.functions = functions;
-		this.functionMap = functions.stream().collect(toMap(f -> SexpUtil.encodeFunction(f.id), f -> f));
 	}
 
 	public Result getResult() {
@@ -83,19 +79,18 @@ public class ResultExtractorListener extends YicesBaseListener {
 	@Override
 	public void enterFunction(FunctionContext ctx) {
 		String name = ctx.ID().getText();
-		Function function = functionMap.get(name);
+		FunctionTable table = model.getFunctionTable(name);
 
 		int n = ctx.value().size();
 		List<Value> inputs = new ArrayList<Value>();
 		for (int i = 0; i < n - 1; i++) {
-			String type = function.inputs.get(i).type.toString();
+			String type = table.getInputs().get(i).type.toString();
 			inputs.add(Util.parseValue(type, ctx.value(i).getText()));
 		}
 
-		String type = function.outputs.get(0).type.toString();
+		String type = table.getOutput().type.toString();
 		Value output = Util.parseValue(type, ctx.value(n - 1).getText());
 
-		FunctionTableRow row = new FunctionTableRow(inputs, output);
-		model.getFunctionTable(name).addRow(row);
+		table.addRow(new FunctionTableRow(inputs, output));
 	}
 }
