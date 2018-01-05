@@ -36,7 +36,7 @@ public class ResultExtractorListener extends YicesBaseListener {
 	public ResultExtractorListener(Map<String, Type> varTypes, List<Function> functions) {
 		this.varTypes = varTypes;
 		this.functions = functions;
-		this.functionMap = functions.stream().collect(toMap(f -> SexpUtil.encodeFunction(f.id).toString(), f -> f));
+		this.functionMap = functions.stream().collect(toMap(f -> SexpUtil.encodeFunction(f.id), f -> f));
 	}
 
 	public Result getResult() {

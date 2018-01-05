@@ -163,7 +163,7 @@ public class SmtInterpolUtil {
 	}
 
 	public static void declareFunction(Script script, Function function) {
-		String encodedName = SexpUtil.encodeFunction(function.id).toString();
+		String encodedName = SexpUtil.encodeFunction(function.id);
 		Sort[] inputs = getSorts(script, function.inputs);
 		Sort output = getSort(script, function.outputs.get(0).type);
 		script.declareFun(encodedName, inputs, output);

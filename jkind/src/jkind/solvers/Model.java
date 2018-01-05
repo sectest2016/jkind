@@ -20,7 +20,7 @@ public abstract class Model {
 	public Model(Map<String, Type> varTypes, List<Function> functions) {
 		this.varTypes = Collections.unmodifiableMap(new HashMap<>(varTypes));
 		for (Function fn : functions) {
-			String encoded = SexpUtil.encodeFunction(fn.id).toString();
+			String encoded = SexpUtil.encodeFunction(fn.id);
 			functionTables.put(encoded, new FunctionTable(fn.id, fn.inputs, fn.outputs.get(0)));
 		}
 	}

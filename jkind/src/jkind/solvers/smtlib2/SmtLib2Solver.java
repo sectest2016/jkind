@@ -71,7 +71,7 @@ public abstract class SmtLib2Solver extends ProcessBasedSolver {
 	@Override
 	public void declare(Function function) {
 		functions.add(function);
-		Symbol name = SexpUtil.encodeFunction(function.id);
+		Symbol name = new Symbol(SexpUtil.encodeFunction(function.id));
 		List<Sexp> inputTypes = function.inputs.stream().map(vd -> type(vd.type)).collect(toList());
 		Sexp inputTypesDecl = inputTypes.isEmpty() ? new Symbol("()") : new Cons(inputTypes);
 		Symbol outputType = type(function.outputs.get(0).type);

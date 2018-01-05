@@ -98,13 +98,13 @@ public class YicesSolver extends ProcessBasedSolver implements MaxSatSolver {
 	}
 
 	private void declareNullaryFunction(Function function) {
-		Symbol name = SexpUtil.encodeFunction(function.id);
+		String name = SexpUtil.encodeFunction(function.id);
 		Symbol type = type(function.outputs.get(0).type);
 		send("(define " + name + " :: " + type + ")");
 	}
 
 	private void declareFunction(Function function) {
-		Symbol name = SexpUtil.encodeFunction(function.id);
+		String name = SexpUtil.encodeFunction(function.id);
 		List<Sexp> args = new ArrayList<>();
 		for (VarDecl input : function.inputs) {
 			args.add(type(input.type));

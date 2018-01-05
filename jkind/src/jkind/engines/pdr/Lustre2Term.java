@@ -188,7 +188,7 @@ public class Lustre2Term extends ScriptUser implements ExprVisitor<Term> {
 		for (int i = 0; i < e.args.size(); i++) {
 			params[i] = e.args.get(i).accept(this);
 		}
-		return term(SexpUtil.encodeFunction(e.function).toString(), params);
+		return term(SexpUtil.encodeFunction(e.function), params);
 	}
 
 	@Override

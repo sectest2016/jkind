@@ -142,7 +142,7 @@ public class Lustre2Sexp implements ExprVisitor<Sexp> {
 	@Override
 	public Sexp visit(FunctionCallExpr e) {
 		if (e.args.isEmpty()) {
-			return SexpUtil.encodeFunction(e.function);
+			return new Symbol(SexpUtil.encodeFunction(e.function));
 		}
 
 		List<Sexp> args = new ArrayList<>();
