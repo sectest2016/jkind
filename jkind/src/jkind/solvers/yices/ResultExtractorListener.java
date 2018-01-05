@@ -86,7 +86,6 @@ public class ResultExtractorListener extends YicesBaseListener {
 		Function function = functionMap.get(name);
 
 		int n = ctx.value().size();
-		System.out.println(name);
 		List<Value> inputs = new ArrayList<Value>();
 		for (int i = 0; i < n - 1; i++) {
 			String type = function.inputs.get(i).type.toString();

@@ -10,6 +10,7 @@ import jkind.lustre.Function;
 import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.Program;
+import jkind.lustre.TupleExpr;
 import jkind.lustre.Type;
 import jkind.lustre.VarDecl;
 import jkind.lustre.visitors.AstMapVisitor;
@@ -30,7 +31,7 @@ public class FlattenCompoundFunctionOutputs extends AstMapVisitor {
 		originalFunctionTable.putAll(Util.getFunctionTable(program.functions));
 		return super.visit(program);
 	}
-	
+
 	@Override
 	protected List<Function> visitFunctions(List<Function> functions) {
 		List<Function> result = new ArrayList<>();
@@ -42,12 +43,13 @@ public class FlattenCompoundFunctionOutputs extends AstMapVisitor {
 
 	private List<Function> visitFunction(Function fn) {
 		List<Function> result = new ArrayList<>();
-		VarDecl output = fn.outputs.get(0);
-		Expr originalFnId = new IdExpr(output.id);
-		for (ExprType et : CompoundUtil.flattenExpr(originalFnId, output.type)) {
-			String newOutputId = et.expr.toString();
-			String newFnId = Util.getBaseFunctionName(fn.id) + "." + newOutputId;
-			result.add(new Function(newFnId, fn.inputs, new VarDecl(newOutputId, et.type)));
+		for (VarDecl output : fn.outputs) {
+			Expr originalFnId = new IdExpr(output.id);
+			for (ExprType et : CompoundUtil.flattenExpr(originalFnId, output.type)) {
+				String newOutputId = et.expr.toString();
+				String newFnId = fn.id + "." + newOutputId;
+				result.add(new Function(newFnId, fn.inputs, new VarDecl(newOutputId, et.type)));
+			}
 		}
 		return result;
 	}
@@ -56,10 +58,15 @@ public class FlattenCompoundFunctionOutputs extends AstMapVisitor {
 	public Expr visit(FunctionCallExpr e) {
 		Function fn = originalFunctionTable.get(e.function);
 		List<Expr> args = visitExprs(e.args);
-		return expand(new IdExpr(fn.id), fn.outputs.get(0).type, args);
+		
+		List<Expr> exprs = new ArrayList<Expr>();
+		for (VarDecl output : fn.outputs) {
+			exprs.add(expand(new IdExpr(fn.id + "." + output.id), output.type, args));
+		}
+		return TupleExpr.compress(exprs);
 	}
 
-	private static Expr expand(Expr expr, Type type, final List<Expr> args) {
+	private static Expr expand(Expr expr, Type type, List<Expr> args) {
 		return new Expander() {
 			@Override
 			protected Expr baseCase(Expr expr) {
