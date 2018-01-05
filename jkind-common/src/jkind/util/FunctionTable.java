@@ -1,5 +1,7 @@
 package jkind.util;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,15 +43,8 @@ public class FunctionTable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		// sb.append(StringUtils.repeat("-", (inputs.size()+1)*10));
-		sb.append("\n");
-		for (VarDecl input : inputs) {
-			sb.append(String.format("%-10s", input.id + " "));
-		}
-		sb.append("| ");
-		sb.append(name);
-		sb.append("\n");
-		// sb.append(StringUtils.repeat("-", (inputs.size()+1)*10));
+		sb.append(inputs.stream().map(vd -> vd.id).collect(joining(", ")));
+		sb.append(", " + name);
 		sb.append("\n");
 		for (FunctionTableRow row : rows) {
 			sb.append(row);

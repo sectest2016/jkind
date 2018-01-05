@@ -3,6 +3,7 @@ package jkind.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import jkind.lustre.values.RealValue;
 import jkind.lustre.values.Value;
@@ -27,25 +28,35 @@ public class CounterexampleFormatter {
 
 	@Override
 	public String toString() {
-		return formatContent(getContent()) + footer();
+		String cexTable = formatContent(getContent(), this::getCexFormatString);
+		return cexTable + functions() + footer();
 	}
 
 	private String footer() {
-		List<FunctionTable> funcTables = cex.getFunctionTables();
+		if (truncated) {
+			return NEWLINE + " * display value has been truncated" + NEWLINE;
+		} else {
+			return "";
+		}
+	}
+
+	private String functions() {
+		List<FunctionTable> functionTables = cex.getFunctionTables();
+		if (functionTables.isEmpty()) {
+			return "";
+		}
+
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(NEWLINE);
 		sb.append("FUNCTIONS");
-		for(FunctionTable funcTable : funcTables){
-			sb.append(NEWLINE);
-			sb.append(funcTable.toString());
+		for (FunctionTable table : functionTables) {
+			if (!table.getRows().isEmpty()) {
+				sb.append(NEWLINE);
+				sb.append(formatFunctionTable(table));
+			}
 		}
-		
-		if (truncated) {
-			return NEWLINE + " * display value has been truncated" + NEWLINE + sb.toString();
-		} else {
-			return sb.toString();
-		}
+		return sb.toString();
 	}
 
 	private List<List<String>> getContent() {
@@ -114,7 +125,30 @@ public class CounterexampleFormatter {
 		}
 	}
 
-	private String formatContent(List<List<String>> content) {
+	private String formatFunctionTable(FunctionTable table) {
+		List<List<String>> content = new ArrayList<>();
+
+		content.add(getFunctionHeader(table));
+		for (FunctionTableRow row : table.getRows()) {
+			List<String> line = new ArrayList<>();
+			row.getInputs().forEach(val -> line.add(getString(val)));
+			line.add("|");
+			line.add(getString(row.getOutput()));
+			content.add(line);
+		}
+
+		return formatContent(content, this::getFunctionTableFormatString);
+	}
+
+	private List<String> getFunctionHeader(FunctionTable table) {
+		List<String> header = new ArrayList<>();
+		table.getInputs().forEach(vd -> header.add(vd.id));
+		header.add("|");
+		header.add(table.getName());
+		return header;
+	}
+
+	private String formatContent(List<List<String>> content, BiFunction<Integer, Integer, String> formatString) {
 		List<Integer> minColumnWidths = computeMinimumColumnWidths(content);
 
 		StringBuilder text = new StringBuilder();
@@ -122,7 +156,7 @@ public class CounterexampleFormatter {
 			List<String> rowContent = content.get(row);
 			for (int col = 0; col < rowContent.size(); col++) {
 				String cell = rowContent.get(col);
-				String format = getFormatString(col, minColumnWidths.get(col));
+				String format = formatString.apply(col, minColumnWidths.get(col));
 				text.append(String.format(format, cell));
 			}
 			text.append(NEWLINE);
@@ -131,7 +165,7 @@ public class CounterexampleFormatter {
 		return text.toString();
 	}
 
-	private String getFormatString(int col, int minWidth) {
+	private String getCexFormatString(int col, int minWidth) {
 		if (col == 0) {
 			int width = minWidth + 6;
 			return "%-" + width + "s ";
@@ -140,6 +174,11 @@ public class CounterexampleFormatter {
 			return "%" + width + "s ";
 		}
 
+	}
+
+	@SuppressWarnings("unused")
+	private String getFunctionTableFormatString(int col, int minWidth) {
+		return "%" + minWidth + "s  ";
 	}
 
 	private List<Integer> computeMinimumColumnWidths(List<List<String>> content) {

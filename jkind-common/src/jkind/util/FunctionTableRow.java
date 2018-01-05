@@ -1,9 +1,10 @@
 package jkind.util;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.List;
 
 import jkind.lustre.values.Value;
-import jkind.util.Util;
 
 public class FunctionTableRow {
 	private final List<Value> inputs;
@@ -39,12 +40,8 @@ public class FunctionTableRow {
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		for(Value val : inputs){
-			sb.append(String.format("%-10s", val.toString() + " "));
-		}
-		sb.append("| ");	
-		sb.append(String.format("%-10s", output.toString()));
+		sb.append(inputs.stream().map(val -> val.toString()).collect(joining(", ")));
+		sb.append(", " + output);
 		return sb.toString();
 	}
-
 }

@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import jkind.lustre.Function;
 import jkind.lustre.Type;
 import jkind.lustre.values.BooleanValue;
-import jkind.lustre.values.FunctionValue;
 import jkind.lustre.values.IntegerValue;
 import jkind.lustre.values.RealValue;
 import jkind.lustre.values.Value;
@@ -162,9 +161,8 @@ public class ModelExtractorListener extends Yices2BaseListener {
 		}
 		Sexp args = new Cons(argDefs);
 		body = new Cons(args, body);
-		
-		FunctionValue fn = new FunctionValue(id, body); 
-		model.addValue(id, fn);
+
+
 	}
 	
 }
