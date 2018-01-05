@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import jkind.lustre.VarDecl;
+import jkind.lustre.values.Value;
 
 public class FunctionTable {
 	private final String name;
@@ -38,6 +39,19 @@ public class FunctionTable {
 
 	public String getName() {
 		return name;
+	}
+	
+	public Value lookup(List<Value> inputValues) {
+		if (inputs.size() != inputValues.size()) {
+			throw new IllegalArgumentException();
+		}
+		
+		for (FunctionTableRow row : rows) {
+			if (row.getInputs().equals(inputValues)) {
+				return row.getOutput();
+			}
+		}
+		return null;
 	}
 
 	@Override

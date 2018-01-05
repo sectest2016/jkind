@@ -1,12 +1,14 @@
 package jkind.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
+import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.UnaryExpr;
 import jkind.lustre.UnaryOp;
@@ -27,6 +29,7 @@ public class ModelReconstructionEvaluator extends Evaluator {
 	}
 
 	private final Specification spec;
+	private final Model originalModel;
 	private final SimpleModel model;
 	private final boolean concrete;
 
@@ -34,9 +37,10 @@ public class ModelReconstructionEvaluator extends Evaluator {
 
 	private int step;
 
-	private ModelReconstructionEvaluator(Specification spec, Model model, boolean concrete) {
+	private ModelReconstructionEvaluator(Specification spec, Model originalModel, boolean concrete) {
 		this.spec = spec;
-		this.model = new SimpleModel(model);
+		this.originalModel = originalModel;
+		this.model = new SimpleModel(originalModel);
 		this.concrete = concrete;
 
 		for (Equation eq : spec.node.equations) {
@@ -49,6 +53,9 @@ public class ModelReconstructionEvaluator extends Evaluator {
 		for (step = 0; step < k; step++) {
 			for (Dependency dependency : dependencies) {
 				eval(new IdExpr(dependency.name));
+			}
+			for (Expr assertion : spec.node.assertions) {
+				eval(assertion);
 			}
 		}
 	}
@@ -109,5 +116,23 @@ public class ModelReconstructionEvaluator extends Evaluator {
 		} else {
 			return super.visit(e);
 		}
+	}
+
+	@Override
+	public Value visit(FunctionCallExpr e) {
+		String name = SexpUtil.encodeFunction(e.function);
+		FunctionTable table = model.getFunctionTable(name);
+		List<Value> inputs = visitExprs(e.args);
+		
+		Value output = table.lookup(inputs);
+		if (output == null) {
+			output = originalModel.getFunctionTable(name).lookup(inputs);
+			if (output == null) {
+				output = Util.getDefaultValue(table.getOutput().type);
+			}
+			table.addRow(new FunctionTableRow(inputs, output));
+		}
+		
+		return output;
 	}
 }

@@ -186,7 +186,7 @@ public abstract class Evaluator implements ExprVisitor<Value> {
 		return value.applyUnaryOp(e.op);
 	}
 
-	private List<Value> visitExprs(List<Expr> es) {
+	protected List<Value> visitExprs(List<Expr> es) {
 		List<Value> values = new ArrayList<>();
 		for (Expr e : es) {
 			Value value = eval(e);
