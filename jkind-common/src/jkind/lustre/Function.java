@@ -1,5 +1,6 @@
 package jkind.lustre;
 
+import java.util.Collections;
 import java.util.List;
 
 import jkind.Assert;
@@ -21,6 +22,10 @@ public class Function extends Ast {
 
 	public Function(String id, List<VarDecl> inputs, List<VarDecl> outputs) {
 		this(Location.NULL, id, inputs, outputs);
+	}
+
+	public Function(String id, List<VarDecl> inputs, VarDecl output) {
+		this(Location.NULL, id, inputs, Collections.singletonList(output));
 	}
 
 	@Override

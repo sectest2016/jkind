@@ -36,10 +36,6 @@ import jkind.lustre.visitors.TypeAwareAstMapVisitor;
 import jkind.lustre.visitors.TypeReconstructor;
 
 public class ExtractorVisitor extends TypeAwareAstMapVisitor {
-	public ExtractorVisitor(Program program) {
-		super(program);
-	}
-
 	public final static String PREFIX = "__extracted__";
 	private final Map<String, ELocation> locationMap = new HashMap<>();
 	private Set<String> constants;

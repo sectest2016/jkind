@@ -10,7 +10,6 @@ public class Translate {
 		program = InlineUserTypes.program(program);
 		program = InlineConstants.program(program);
 		program = RemoveCondacts.program(program);
-		program = FlattenFunctionsWithComplexTypes.program(program);
 		program = InlineNodeCalls.program(program);
 		program = FlattenTuples.program(program);
 		program = FlattenCompoundTypes.program(program);

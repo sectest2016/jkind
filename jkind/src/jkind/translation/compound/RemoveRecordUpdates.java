@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jkind.lustre.Expr;
-import jkind.lustre.Node;
 import jkind.lustre.Program;
 import jkind.lustre.RecordAccessExpr;
 import jkind.lustre.RecordExpr;
@@ -29,12 +28,8 @@ import jkind.lustre.visitors.TypeAwareAstMapVisitor;
  * Guarantees: All record update expressions are removed
  */
 public class RemoveRecordUpdates extends TypeAwareAstMapVisitor {
-	public RemoveRecordUpdates(Program program) {
-		super(program);
-	}
-
-	public static Node node(Node node, Program program) {
-		return new RemoveRecordUpdates(program).visit(node);
+	public static Program program(Program program) {
+		return new RemoveRecordUpdates().visit(program);
 	}
 	
 	@Override
