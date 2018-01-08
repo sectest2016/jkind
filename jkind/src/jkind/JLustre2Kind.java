@@ -32,7 +32,7 @@ public class JLustre2Kind {
 			program = Translate.translate(program);
 			Node main = program.getMainNode();
 			main = RemoveEnumTypes.node(main);
-			main = LustreSlicer.slice(main, new DependencyMap(main, main.properties));
+			main = LustreSlicer.slice(main, new DependencyMap(main, main.properties, program.functions));
 
 			if (settings.encode) {
 				main = new KindEncodeIdsVisitor().visit(main);

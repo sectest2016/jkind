@@ -22,9 +22,9 @@ public class Specification {
 	public Specification(Program program, boolean slicing) {
 		Node main = program.getMainNode();
 		if (slicing) {
-			this.dependencyMap = new DependencyMap(main, main.properties);
+			this.dependencyMap = new DependencyMap(main, main.properties, program.functions);
 		} else {
-			this.dependencyMap = DependencyMap.full(main);
+			this.dependencyMap = DependencyMap.full(main, program.functions);
 		}
 		this.node = LustreSlicer.slice(main, dependencyMap);
 		this.functions = Util.safeList(program.functions);

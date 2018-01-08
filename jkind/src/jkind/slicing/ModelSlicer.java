@@ -9,7 +9,7 @@ public class ModelSlicer {
 		SimpleModel sliced = new SimpleModel();
 		for (String var : original.getVariableNames()) {
 			StreamIndex si = StreamIndex.decode(var);
-			if (si != null && keep.contains(si.getStream())) {
+			if (si != null && keep.contains(Dependency.variable(si.getStream()))) {
 				sliced.putValue(si, original.getValue(var));
 			}
 		}
