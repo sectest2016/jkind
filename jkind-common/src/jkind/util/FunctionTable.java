@@ -2,9 +2,10 @@ package jkind.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import jkind.lustre.VarDecl;
 import jkind.lustre.values.Value;
@@ -13,7 +14,7 @@ public class FunctionTable {
 	private final String name;
 	private final List<VarDecl> inputs;
 	private final VarDecl output;
-	private final Map<FunctionTableRow, Value> rows = new HashMap<>();
+	private final SortedMap<FunctionTableRow, Value> rows = new TreeMap<>();
 
 	public FunctionTable(String name, List<VarDecl> inputs, VarDecl output) {
 		this.name = name;
