@@ -50,28 +50,31 @@ public class SmtLib2Model extends Model {
 		if (parentResult != null) {
 			return parentResult;
 		}
-		
+
 		// Function value will otherwise be computed from lambda s-expression
 		Sexp lambda = values.get(name);
 		if (lambda == null) {
 			return null;
 		}
-		
-		if (inputs.isEmpty()) {
-			return new SexpEvaluator(this).eval(lambda);
-		}
 
-		Cons cons = (Cons) lambda;
-		Map<String, Value> env = zipMap(getArgNames(cons.args.get(0)), inputs);
-		Sexp body = cons.args.get(1);
-		return new SexpEvaluator(env::get).eval(body);
+		Value value;
+		if (inputs.isEmpty()) {
+			value = new SexpEvaluator(this).eval(lambda);
+		} else {
+			Cons cons = (Cons) lambda;
+			Map<String, Value> env = zipMap(getArgNames(cons.args.get(0)), inputs);
+			Sexp body = cons.args.get(1);
+			value = new SexpEvaluator(env::get).eval(body);
+		}
+		Type type = getFunctionTable(name).getOutput().type;
+		return Util.promoteIfNeeded(value, type);
 	}
 
 	private List<String> getArgNames(Sexp sexp) {
 		if (sexp instanceof Symbol) {
 			return Collections.emptyList();
 		}
-		
+
 		List<String> args = new ArrayList<>();
 		Cons cons = (Cons) sexp;
 

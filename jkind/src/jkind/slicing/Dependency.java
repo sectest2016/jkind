@@ -51,4 +51,8 @@ public class Dependency {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
 }

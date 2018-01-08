@@ -35,4 +35,9 @@ public class DependencySet implements Iterable<Dependency> {
 	public Dependency first() {
 		return iterator().next();
 	}
+	
+	@Override
+	public String toString() {
+		return set.toString();
+	}
 }
