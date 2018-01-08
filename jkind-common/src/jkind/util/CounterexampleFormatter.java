@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.BiFunction;
 
 import jkind.lustre.values.RealValue;
@@ -52,7 +53,7 @@ public class CounterexampleFormatter {
 		sb.append(NEWLINE);
 		sb.append("FUNCTIONS");
 		for (FunctionTable table : functionTables) {
-			if (!table.getRows().isEmpty()) {
+			if (!table.getBody().isEmpty()) {
 				sb.append(NEWLINE);
 				sb.append(formatFunctionTable(table));
 			}
@@ -141,11 +142,13 @@ public class CounterexampleFormatter {
 		List<List<String>> content = new ArrayList<>();
 
 		content.add(getFunctionHeader(table));
-		for (FunctionTableRow row : table.getRows()) {
+		for (Entry<FunctionTableRow, Value> entry : table.getBody().entrySet()) {
+			FunctionTableRow row = entry.getKey();
+			Value output = entry.getValue();
 			List<String> line = new ArrayList<>();
 			row.getInputs().forEach(val -> line.add(getString(val)));
 			line.add("|");
-			line.add(getString(row.getOutput()));
+			line.add(getString(output));
 			content.add(line);
 		}
 

@@ -42,7 +42,7 @@ public class YicesModel extends Model {
 		if (value == null) {
 			return Util.getDefaultValue(varTypes.get(name));
 		} else {
-			return value;
+			return Util.promoteIfNeeded(value, varTypes.get(name));
 		}
 	}
 

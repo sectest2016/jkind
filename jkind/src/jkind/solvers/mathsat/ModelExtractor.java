@@ -21,7 +21,6 @@ import jkind.solvers.smtlib2.Quoting;
 import jkind.solvers.smtlib2.SexpEvaluator;
 import jkind.solvers.smtlib2.SmtLib2Model;
 import jkind.util.FunctionTable;
-import jkind.util.FunctionTableRow;
 
 public class ModelExtractor {
 	public static SmtLib2Model getModel(ModelContext ctx, Map<String, Type> varTypes, List<Function> functions) {
@@ -48,8 +47,7 @@ public class ModelExtractor {
 				inputs.add(eval.eval(sexp(arg)));
 			}
 			Value output = eval.eval(sexp(assignCtx.body()));
-			FunctionTableRow row = new FunctionTableRow(inputs, output);
-			table.addRow(row);
+			table.addRow(inputs, output);
 		}
 	}
 

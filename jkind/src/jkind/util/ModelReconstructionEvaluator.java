@@ -157,7 +157,7 @@ public class ModelReconstructionEvaluator extends Evaluator {
 				output = Util.getDefaultValue(outputType);
 			}
 
-			model.getFunctionTable(name).addRow(new FunctionTableRow(inputs, output));
+			model.getFunctionTable(name).addRow(inputs, output);
 		}
 
 		return output;

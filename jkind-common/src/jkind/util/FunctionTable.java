@@ -1,19 +1,19 @@
 package jkind.util;
 
-import static java.util.stream.Collectors.joining;
-
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import jkind.lustre.VarDecl;
 import jkind.lustre.values.Value;
 
 public class FunctionTable {
 	private final String name;
-	private final Set<FunctionTableRow> rows = new HashSet<>();
 	private final List<VarDecl> inputs;
 	private final VarDecl output;
+	private final Map<FunctionTableRow, Value> rows = new HashMap<>();
 
 	public FunctionTable(String name, List<VarDecl> inputs, VarDecl output) {
 		this.name = name;
@@ -21,8 +21,16 @@ public class FunctionTable {
 		this.output = output;
 	}
 
-	public void addRow(FunctionTableRow row) {
-		rows.add(row);
+	public void addRow(List<Value> inputValues, Value outputValue) {
+		rows.put(makeRow(inputValues), Util.promoteIfNeeded(outputValue, output.type));
+	}
+
+	private FunctionTableRow makeRow(List<Value> inputValues) {
+		List<Value> typeCorrectInputs = new ArrayList<>();
+		for (int i = 0; i < inputValues.size(); i++) {
+			typeCorrectInputs.add(Util.promoteIfNeeded(inputValues.get(i), inputs.get(i).type));
+		}
+		return new FunctionTableRow(typeCorrectInputs);
 	}
 
 	public List<VarDecl> getInputs() {
@@ -33,43 +41,24 @@ public class FunctionTable {
 		return output;
 	}
 
-	public Set<FunctionTableRow> getRows() {
-		return rows;
-	}
-
 	public String getName() {
 		return name;
+	}
+	
+	public Map<FunctionTableRow, Value> getBody() {
+		return Collections.unmodifiableMap(rows);
 	}
 
 	public Value lookup(List<Value> inputValues) {
 		if (inputs.size() != inputValues.size()) {
 			throw new IllegalArgumentException();
 		}
-
-		for (FunctionTableRow row : rows) {
-			if (row.getInputs().equals(inputValues)) {
-				return row.getOutput();
-			}
-		}
-		return null;
+		return rows.get(makeRow(inputValues));
 	}
 
 	public FunctionTable copy() {
 		FunctionTable copy = new FunctionTable(name, inputs, output);
-		copy.rows.addAll(rows);
+		copy.rows.putAll(rows);
 		return copy;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(inputs.stream().map(vd -> vd.id).collect(joining(", ")));
-		sb.append(", " + name);
-		sb.append("\n");
-		for (FunctionTableRow row : rows) {
-			sb.append(row);
-			sb.append("\n");
-		}
-		return sb.toString();
 	}
 }

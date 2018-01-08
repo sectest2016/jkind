@@ -30,7 +30,6 @@ import jkind.solvers.yices2.Yices2Parser.ValueContext;
 import jkind.solvers.yices2.Yices2Parser.VariableContext;
 import jkind.util.BigFraction;
 import jkind.util.FunctionTable;
-import jkind.util.FunctionTableRow;
 
 public class ModelExtractorListener extends Yices2BaseListener {
 	private final Yices2Model model;
@@ -111,7 +110,7 @@ public class ModelExtractorListener extends Yices2BaseListener {
 				inputs.add(value(valueCtx.value(i)));
 			}
 			Value output = value(valueCtx.value(n));
-			table.addRow(new FunctionTableRow(inputs, output));
+			table.addRow(inputs, output);
 		}
 
 		if (ctx.defaultValue() != null) {

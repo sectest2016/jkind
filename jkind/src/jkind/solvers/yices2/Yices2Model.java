@@ -8,6 +8,8 @@ import jkind.lustre.Function;
 import jkind.lustre.Type;
 import jkind.lustre.values.Value;
 import jkind.solvers.yices.YicesModel;
+import jkind.util.FunctionTable;
+import jkind.util.Util;
 
 public class Yices2Model extends YicesModel {
 	private final Map<String, Value> functionDefaultValue = new HashMap<>();
@@ -23,10 +25,13 @@ public class Yices2Model extends YicesModel {
 	@Override
 	public Value evaluateFunction(String name, List<Value> inputs) {
 		name = getAlias(name);
-		Value value = functionTables.get(name).lookup(inputs);
+		
+		FunctionTable table = functionTables.get(name);
+		Value value = table.lookup(inputs);
 		if (value == null) {
 			value = functionDefaultValue.get(name);
 		}
-		return value;
+		
+		return Util.promoteIfNeeded(value, table.getOutput().type);
 	}
 }

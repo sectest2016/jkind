@@ -7,15 +7,11 @@ import java.util.Map;
 import java.util.Set;
 
 import jkind.lustre.Function;
-import jkind.lustre.NamedType;
 import jkind.lustre.Type;
-import jkind.lustre.values.IntegerValue;
-import jkind.lustre.values.RealValue;
 import jkind.lustre.values.Value;
 import jkind.sexp.Cons;
 import jkind.sexp.Sexp;
 import jkind.solvers.Model;
-import jkind.util.BigFraction;
 import jkind.util.Util;
 
 public class SmtLib2Model extends Model {
@@ -37,15 +33,7 @@ public class SmtLib2Model extends Model {
 			return Util.getDefaultValue(type);
 		}
 		Value value = new SexpEvaluator(this).eval(sexp);
-		return promoteIfNeeded(value, type);
-	}
-
-	private Value promoteIfNeeded(Value value, Type type) {
-		if (value instanceof IntegerValue && type == NamedType.REAL) {
-			IntegerValue iv = (IntegerValue) value;
-			return new RealValue(new BigFraction(iv.value));
-		}
-		return value;
+		return Util.promoteIfNeeded(value, type);
 	}
 
 	@Override

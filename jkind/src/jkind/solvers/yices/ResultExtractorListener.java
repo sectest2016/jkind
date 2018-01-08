@@ -20,7 +20,6 @@ import jkind.solvers.yices.YicesParser.UnsatCoreContext;
 import jkind.solvers.yices.YicesParser.UnsatResultContext;
 import jkind.solvers.yices.YicesParser.VariableContext;
 import jkind.util.FunctionTable;
-import jkind.util.FunctionTableRow;
 import jkind.util.Util;
 
 public class ResultExtractorListener extends YicesBaseListener {
@@ -91,6 +90,6 @@ public class ResultExtractorListener extends YicesBaseListener {
 		String type = table.getOutput().type.toString();
 		Value output = Util.parseValue(type, ctx.value(n - 1).getText());
 
-		table.addRow(new FunctionTableRow(inputs, output));
+		table.addRow(inputs, output);
 	}
 }

@@ -179,6 +179,14 @@ public class Util {
 		return new ArrayValue(elements);
 	}
 
+	public static Value promoteIfNeeded(Value value, Type type) {
+		if (value instanceof IntegerValue && type == NamedType.REAL) {
+			IntegerValue iv = (IntegerValue) value;
+			return new RealValue(new BigFraction(iv.value));
+		}
+		return value;
+	}
+	
 	private static Element getElement(Element element, String name, int index) {
 		return (Element) element.getElementsByTagName(name).item(index);
 	}

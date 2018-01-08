@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import jkind.interval.BoolInterval;
@@ -122,21 +123,23 @@ public class XmlWriter extends Writer {
 
 	private void writeFunction(FunctionTable table) {
 		out.println("      <Function name=\"" + table.getName() + "\">");
-		List<VarDecl> inputs = table.getInputs();
-		for (VarDecl input : inputs) {
-			out.println("        <Input name=\"" + input.id + "\" type=\"" + input.type + "\"/>");
+		List<VarDecl> inputDecls = table.getInputs();
+		for (VarDecl inputDecl : inputDecls) {
+			out.println("        <Input name=\"" + inputDecl.id + "\" type=\"" + inputDecl.type + "\"/>");
 		}
-		VarDecl output = table.getOutput();
-		out.println("        <Output name=\"" + output.id + "\" type=\"" + output.type + "\"/>");
+		VarDecl outputDecl = table.getOutput();
+		out.println("        <Output name=\"" + outputDecl.id + "\" type=\"" + outputDecl.type + "\"/>");
 
-		for (FunctionTableRow row : table.getRows()) {
-			String formatted = !Util.isArbitrary(row.getOutput()) ? formatValue(row.getOutput()) : "";
+		for (Entry<FunctionTableRow, Value> entry : table.getBody().entrySet()) {
+			FunctionTableRow row = entry.getKey();
+			Value output = entry.getValue();
+			String formatted = !Util.isArbitrary(output) ? formatValue(output) : "";
 			out.println("        <FunctionValue value=\"" + formatted + "\">");
 			for (int i = 0; i < row.getInputs().size(); i++) {
 				Value input = row.getInputs().get(i);
 				formatted = !Util.isArbitrary(input) ? formatValue(input) : "";
 				out.println(
-						"          <ArgumentValue name=\"" + inputs.get(i).id + "\" value=\"" + formatted + "\"/>");
+						"          <ArgumentValue name=\"" + inputDecls.get(i).id + "\" value=\"" + formatted + "\"/>");
 			}
 			out.println("        </FunctionValue>");
 		}
