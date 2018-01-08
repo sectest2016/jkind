@@ -61,6 +61,13 @@ public class SmtLib2Model extends Model {
 
 	@Override
 	public Value evaluateFunction(String name, List<Value> inputs) {
+		// Function value may be stored in the tables
+		Value parentResult = super.evaluateFunction(name, inputs);
+		if (parentResult != null) {
+			return parentResult;
+		}
+		
+		// Function value will otherwise be computed from lambda s-expression
 		Sexp lambda = values.get(name);
 		if (lambda == null) {
 			return null;
