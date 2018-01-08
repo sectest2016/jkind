@@ -401,14 +401,11 @@ public class Yices2Parser extends Parser {
 
 	public static class FunctionValueContext extends ParserRuleContext {
 		public TerminalNode ID() { return getToken(Yices2Parser.ID, 0); }
-		public List<NumericContext> numeric() {
-			return getRuleContexts(NumericContext.class);
+		public List<ValueContext> value() {
+			return getRuleContexts(ValueContext.class);
 		}
-		public ValueContext value() {
-			return getRuleContext(ValueContext.class,0);
-		}
-		public NumericContext numeric(int i) {
-			return getRuleContext(NumericContext.class,i);
+		public ValueContext value(int i) {
+			return getRuleContext(ValueContext.class,i);
 		}
 		public FunctionValueContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -441,13 +438,13 @@ public class Yices2Parser extends Parser {
 			do {
 				{
 				{
-				setState(79); numeric();
+				setState(79); value();
 				}
 				}
 				setState(82); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( _la==T__5 || _la==INT );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << BOOL) | (1L << INT))) != 0) );
 			setState(84); match(T__4);
 			setState(85); value();
 			setState(86); match(T__4);
@@ -771,7 +768,7 @@ public class Yices2Parser extends Parser {
 		"\2:9\3\2\2\2:;\3\2\2\2;<\3\2\2\2<=\7\n\2\2=\t\3\2\2\2>?\7\t\2\2?@\7\5"+
 		"\2\2@A\7\t\2\2AE\7\6\2\2BD\5\f\7\2CB\3\2\2\2DG\3\2\2\2EC\3\2\2\2EF\3\2"+
 		"\2\2FH\3\2\2\2GE\3\2\2\2HI\7\n\2\2IJ\7\n\2\2J\13\3\2\2\2KL\t\2\2\2L\r"+
-		"\3\2\2\2MN\7\t\2\2NO\7\f\2\2OP\7\t\2\2PR\7\21\2\2QS\5\30\r\2RQ\3\2\2\2"+
+		"\3\2\2\2MN\7\t\2\2NO\7\f\2\2OP\7\t\2\2PR\7\21\2\2QS\5\22\n\2RQ\3\2\2\2"+
 		"ST\3\2\2\2TR\3\2\2\2TU\3\2\2\2UV\3\2\2\2VW\7\n\2\2WX\5\22\n\2XY\7\n\2"+
 		"\2Y\17\3\2\2\2Z[\7\t\2\2[\\\7\4\2\2\\]\5\22\n\2]^\7\n\2\2^\21\3\2\2\2"+
 		"_b\7\17\2\2`b\5\30\r\2a_\3\2\2\2a`\3\2\2\2b\23\3\2\2\2ci\7\20\2\2de\7"+

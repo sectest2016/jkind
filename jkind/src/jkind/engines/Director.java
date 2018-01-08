@@ -331,8 +331,7 @@ public class Director extends MessageHandler {
 
 		double runtime = getRuntime();
 		for (String invalidProp : newInvalid) {
-			Model model = im.model.slice(analysisSpec.dependencyMap.get(invalidProp));
-			Counterexample cex = extractCounterexample(invalidProp, im.length, model, true);
+			Counterexample cex = extractCounterexample(invalidProp, im.length, im.model, true);
 			writer.writeInvalid(invalidProp, im.source, cex, Collections.emptyList(), runtime);
 		}
 	}
@@ -476,8 +475,7 @@ public class Director extends MessageHandler {
 
 		for (String prop : inductiveCounterexamples.keySet()) {
 			InductiveCounterexampleMessage icm = inductiveCounterexamples.get(prop);
-			Model model = icm.model.slice(analysisSpec.dependencyMap.get(prop));
-			result.put(prop, extractCounterexample(prop, icm.length, model, false));
+			result.put(prop, extractCounterexample(prop, icm.length, icm.model, false));
 		}
 
 		return result;

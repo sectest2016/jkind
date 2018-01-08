@@ -13,8 +13,8 @@ import jkind.solvers.Model;
 import jkind.util.Util;
 
 public class YicesModel extends Model {
-	private final Map<String, String> aliases = new HashMap<>();
-	private final Map<String, Value> values = new HashMap<>();
+	protected final Map<String, String> aliases = new HashMap<>();
+	protected final Map<String, Value> values = new HashMap<>();
 
 	public YicesModel(Map<String, Type> varTypes, List<Function> functions) {
 		super(varTypes, functions);
@@ -28,7 +28,7 @@ public class YicesModel extends Model {
 		values.put(name, value);
 	}
 
-	private String getAlias(String name) {
+	protected String getAlias(String name) {
 		String result = name;
 		while (aliases.containsKey(result)) {
 			result = aliases.get(result);

@@ -5,14 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import jkind.lustre.Function;
 import jkind.lustre.Type;
 import jkind.lustre.values.Value;
-import jkind.slicing.Dependency;
-import jkind.slicing.DependencySet;
 import jkind.util.FunctionTable;
 import jkind.util.SexpUtil;
 import jkind.util.StreamIndex;
@@ -51,26 +48,5 @@ public abstract class Model {
 
 	public Value evaluateFunction(String name, List<Value> inputs) {
 		return functionTables.get(name).lookup(inputs);
-	}
-
-	public Model slice(DependencySet keep) {
-		SimpleModel sliced = new SimpleModel();
-		for (String var : getVariableNames()) {
-			StreamIndex si = StreamIndex.decode(var);
-			if (si != null && keep.contains(Dependency.variable(si.getStream()))) {
-				sliced.putValue(si, getValue(var));
-			}
-		}
-		
-		for (Entry<String, FunctionTable> entry : functionTables.entrySet()) {
-			String encoded = entry.getKey();
-			FunctionTable table = entry.getValue();
-			
-			if (keep.contains(Dependency.function(table.getName()))) {
-				sliced.addFunctionTable(encoded, table);
-			}
-		}
-
-		return sliced;
 	}
 }
