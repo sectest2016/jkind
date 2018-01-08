@@ -63,8 +63,6 @@ public class SmtLib2Model extends Model {
 
 		Cons cons = (Cons) lambda;
 		Map<String, Value> env = zipMap(getArgNames(cons.args.get(0)), inputs);
-		System.out.println(name);
-		System.out.println(inputs);
 		Sexp body = cons.args.get(1);
 		return new SexpEvaluator(env::get).eval(body);
 	}
