@@ -1,6 +1,7 @@
 package jkind.solvers.smtlib2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import jkind.lustre.Type;
 import jkind.lustre.values.Value;
 import jkind.sexp.Cons;
 import jkind.sexp.Sexp;
+import jkind.sexp.Symbol;
 import jkind.solvers.Model;
 import jkind.util.Util;
 
@@ -54,14 +56,24 @@ public class SmtLib2Model extends Model {
 		if (lambda == null) {
 			return null;
 		}
+		
+		if (inputs.isEmpty()) {
+			return new SexpEvaluator(this).eval(lambda);
+		}
 
 		Cons cons = (Cons) lambda;
 		Map<String, Value> env = zipMap(getArgNames(cons.args.get(0)), inputs);
+		System.out.println(name);
+		System.out.println(inputs);
 		Sexp body = cons.args.get(1);
 		return new SexpEvaluator(env::get).eval(body);
 	}
 
 	private List<String> getArgNames(Sexp sexp) {
+		if (sexp instanceof Symbol) {
+			return Collections.emptyList();
+		}
+		
 		List<String> args = new ArrayList<>();
 		Cons cons = (Cons) sexp;
 

@@ -3,6 +3,7 @@ package jkind.solvers.smtinterpol;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
