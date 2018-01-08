@@ -24,7 +24,6 @@ import jkind.realizability.writers.Writer;
 import jkind.realizability.writers.XmlWriter;
 import jkind.results.Counterexample;
 import jkind.results.layout.RealizabilityNodeLayout;
-import jkind.slicing.ModelSlicer;
 import jkind.solvers.Model;
 import jkind.translation.Specification;
 import jkind.util.CounterexampleExtractor;
@@ -190,7 +189,7 @@ public class RealizabilityDirector {
 		if (properties.isEmpty()) {
 			return model;
 		}
-		return ModelSlicer.slice(model, spec.dependencyMap.get(properties));
+		return model.slice(spec.dependencyMap.get(properties));
 	}
 
 	private Counterexample convertExtendCounterexample() {

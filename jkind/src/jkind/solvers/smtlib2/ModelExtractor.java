@@ -34,7 +34,7 @@ public class ModelExtractor {
 		Sexp args = getArgs(ctx.arg());
 		Sexp body = sexp(ctx.body());
 		if (args != null) {
-			body = new Cons(args, body);
+			body = new Cons("lambda", args, body);
 		}
 		model.addValue(var, body);
 	}

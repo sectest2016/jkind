@@ -2,9 +2,11 @@ package jkind.solvers;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jkind.lustre.Function;
 import jkind.lustre.values.Value;
 import jkind.util.StreamIndex;
 
@@ -15,15 +17,8 @@ public class SimpleModel extends Model {
 		super(Collections.emptyMap(), Collections.emptyList());
 	}
 
-	public SimpleModel(Model other) {
-		super(Collections.emptyMap(), Collections.emptyList());
-		for (String var : other.getVariableNames()) {
-			StreamIndex si = StreamIndex.decode(var);
-			if (si != null) {
-				putValue(si, other.getValue(var));
-			}
-		}
-		addFunctionTables(other.getFunctionTables());
+	public SimpleModel(List<Function> functions) {
+		super(Collections.emptyMap(), functions);
 	}
 
 	public void putValue(StreamIndex si, Value value) {

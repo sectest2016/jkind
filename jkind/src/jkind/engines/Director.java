@@ -35,7 +35,6 @@ import jkind.engines.pdr.PdrEngine;
 import jkind.lustre.Expr;
 import jkind.results.Counterexample;
 import jkind.results.layout.NodeLayout;
-import jkind.slicing.ModelSlicer;
 import jkind.solvers.Model;
 import jkind.translation.Specification;
 import jkind.util.CounterexampleExtractor;
@@ -332,7 +331,7 @@ public class Director extends MessageHandler {
 
 		double runtime = getRuntime();
 		for (String invalidProp : newInvalid) {
-			Model model = ModelSlicer.slice(im.model, analysisSpec.dependencyMap.get(invalidProp));
+			Model model = im.model.slice(analysisSpec.dependencyMap.get(invalidProp));
 			Counterexample cex = extractCounterexample(invalidProp, im.length, model, true);
 			writer.writeInvalid(invalidProp, im.source, cex, Collections.emptyList(), runtime);
 		}
@@ -477,7 +476,7 @@ public class Director extends MessageHandler {
 
 		for (String prop : inductiveCounterexamples.keySet()) {
 			InductiveCounterexampleMessage icm = inductiveCounterexamples.get(prop);
-			Model model = ModelSlicer.slice(icm.model, analysisSpec.dependencyMap.get(prop));
+			Model model = icm.model.slice(analysisSpec.dependencyMap.get(prop));
 			result.put(prop, extractCounterexample(prop, icm.length, model, false));
 		}
 

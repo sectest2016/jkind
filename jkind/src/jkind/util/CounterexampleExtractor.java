@@ -31,7 +31,7 @@ public class CounterexampleExtractor {
 				signal.putValue(si.getIndex(), value);
 			}
 		}
-		cex.addFunctionTable(model.getFunctionTables().values());
+		cex.addFunctionTable(model.getFunctionTables());
 		return cex;
 	}
 

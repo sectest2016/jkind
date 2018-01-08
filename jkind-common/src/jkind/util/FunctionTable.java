@@ -40,18 +40,24 @@ public class FunctionTable {
 	public String getName() {
 		return name;
 	}
-	
+
 	public Value lookup(List<Value> inputValues) {
 		if (inputs.size() != inputValues.size()) {
 			throw new IllegalArgumentException();
 		}
-		
+
 		for (FunctionTableRow row : rows) {
 			if (row.getInputs().equals(inputValues)) {
 				return row.getOutput();
 			}
 		}
 		return null;
+	}
+
+	public FunctionTable copy() {
+		FunctionTable copy = new FunctionTable(name, inputs, output);
+		copy.rows.addAll(rows);
+		return copy;
 	}
 
 	@Override
@@ -66,5 +72,4 @@ public class FunctionTable {
 		}
 		return sb.toString();
 	}
-
 }

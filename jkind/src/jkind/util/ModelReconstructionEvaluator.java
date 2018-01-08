@@ -4,25 +4,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jkind.JKindException;
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
+import jkind.lustre.Type;
 import jkind.lustre.UnaryExpr;
 import jkind.lustre.UnaryOp;
+import jkind.lustre.values.BooleanValue;
 import jkind.lustre.values.Value;
 import jkind.lustre.visitors.Evaluator;
 import jkind.slicing.Dependency;
 import jkind.slicing.DependencySet;
+import jkind.slicing.DependencyType;
 import jkind.solvers.Model;
 import jkind.solvers.SimpleModel;
 import jkind.translation.Specification;
 
 public class ModelReconstructionEvaluator extends Evaluator {
-	public static Model reconstruct(Specification spec, Model model, String property, int k,
-			boolean concrete) {
+	public static Model reconstruct(Specification spec, Model model, String property, int k, boolean concrete) {
 		ModelReconstructionEvaluator eval = new ModelReconstructionEvaluator(spec, model, concrete);
 		eval.reconstructValues(property, k);
 		return eval.model;
@@ -40,7 +43,7 @@ public class ModelReconstructionEvaluator extends Evaluator {
 	private ModelReconstructionEvaluator(Specification spec, Model originalModel, boolean concrete) {
 		this.spec = spec;
 		this.originalModel = originalModel;
-		this.model = new SimpleModel(originalModel);
+		this.model = new SimpleModel(spec.functions);
 		this.concrete = concrete;
 
 		for (Equation eq : spec.node.equations) {
@@ -52,11 +55,23 @@ public class ModelReconstructionEvaluator extends Evaluator {
 		DependencySet dependencies = spec.dependencyMap.get(property);
 		for (step = 0; step < k; step++) {
 			for (Dependency dependency : dependencies) {
-				eval(new IdExpr(dependency.name));
+				if (dependency.type == DependencyType.VARIABLE) {
+					eval(new IdExpr(dependency.name));
+				}
 			}
 			for (Expr assertion : spec.node.assertions) {
-				eval(assertion);
+				BooleanValue bv = (BooleanValue) eval(assertion);
+				if (!bv.value) {
+					throw new JKindException("Unable to reconstruct counterexample: assertion became false");
+				}
 			}
+		}
+
+		// Check property is still falsified
+		step = k - 1;
+		BooleanValue bv = (BooleanValue) eval(new IdExpr(property));
+		if (bv.value) {
+			throw new JKindException("Unable to reconstruct counterexample: property became true");
 		}
 	}
 
@@ -69,15 +84,26 @@ public class ModelReconstructionEvaluator extends Evaluator {
 			return value;
 		}
 
-		if (step < 0) {
-			return getDefaultValue(si);
-		}
-
 		Expr expr = equations.get(e.id);
 		if (expr == null) {
-			value = getDefaultValue(si);
+			// Input variable
+			value = originalModel.getValue(si);
+			if (value == null) {
+				value = getDefaultValue(si);
+			}
 		} else {
-			value = eval(expr);
+			// Equation variable
+			if (step < 0) {
+				value = originalModel.getValue(si);
+				if (value == null) {
+					value = getDefaultValue(si);
+				}
+			} else {
+				value = eval(expr);
+				if (value == null) {
+					throw new JKindException("Unable to reconstruct counterexample: evaluation failed");
+				}
+			}
 		}
 
 		model.putValue(si, value);
@@ -121,18 +147,19 @@ public class ModelReconstructionEvaluator extends Evaluator {
 	@Override
 	public Value visit(FunctionCallExpr e) {
 		String name = SexpUtil.encodeFunction(e.function);
-		FunctionTable table = model.getFunctionTable(name);
 		List<Value> inputs = visitExprs(e.args);
-		
-		Value output = table.lookup(inputs);
+
+		Value output = model.evaluateFunction(name, inputs);
 		if (output == null) {
-			output = originalModel.getFunctionTable(name).lookup(inputs);
+			output = originalModel.evaluateFunction(name, inputs);
 			if (output == null) {
-				output = Util.getDefaultValue(table.getOutput().type);
+				Type outputType = model.getFunctionTable(name).getOutput().type;
+				output = Util.getDefaultValue(outputType);
 			}
-			table.addRow(new FunctionTableRow(inputs, output));
+
+			model.getFunctionTable(name).addRow(new FunctionTableRow(inputs, output));
 		}
-		
+
 		return output;
 	}
 }
