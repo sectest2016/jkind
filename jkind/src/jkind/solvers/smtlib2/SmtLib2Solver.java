@@ -198,7 +198,7 @@ public abstract class SmtLib2Solver extends ProcessBasedSolver {
 		return parseSmtLib2Model(modelStr, varTypes, functions);
 	}
 
-	public static Model parseSmtLib2Model(String modelStr, Map<String, Type> varTypes, List<Function> functions) {
+	public static SmtLib2Model parseSmtLib2Model(String modelStr, Map<String, Type> varTypes, List<Function> functions) {
 		CharStream stream = new ANTLRInputStream(modelStr);
 		SmtLib2Lexer lexer = new SmtLib2Lexer(stream);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);

@@ -23,12 +23,12 @@ import jkind.lustre.Function;
 import jkind.lustre.Node;
 import jkind.lustre.Type;
 import jkind.lustre.VarDecl;
-import jkind.lustre.values.Value;
-import jkind.solvers.SimpleModel;
 import jkind.solvers.smtinterpol.ScriptUser;
 import jkind.solvers.smtinterpol.SmtInterpolUtil;
 import jkind.solvers.smtinterpol.Subst;
 import jkind.solvers.smtinterpol.Term2Expr;
+import jkind.solvers.smtlib2.SmtLib2Model;
+import jkind.solvers.smtlib2.SmtLib2Solver;
 import jkind.translation.Relation;
 import jkind.util.StreamIndex;
 
@@ -50,6 +50,8 @@ public class PdrSmt extends ScriptUser {
 
 	private final NameGenerator abstractAssertions = new NameGenerator("abstract");
 
+	private final List<Function> functions;
+
 	public PdrSmt(Node node, List<Function> functions, List<Frame> F, String property, String scratchBase) {
 		super(SmtInterpolUtil.getScript(scratchBase));
 		this.F = F;
@@ -60,6 +62,7 @@ public class PdrSmt extends ScriptUser {
 		script.setLogic(Logics.QF_UFLIRA);
 		script.setOption(":verbosity", 2);
 
+		this.functions = functions;
 		declareFunctions(functions);
 
 		Lustre2Term lustre2Term = new Lustre2Term(script, node);
@@ -330,7 +333,7 @@ public class PdrSmt extends ScriptUser {
 
 		case SAT:
 			int length = terms.size() - 1;
-			SimpleModel extractedModel = extractModel(script.getModel(), length);
+			SmtLib2Model extractedModel = extractModel(script.getModel(), length);
 			throw new CounterexampleException(length, extractedModel);
 
 		default:
@@ -339,18 +342,16 @@ public class PdrSmt extends ScriptUser {
 		}
 	}
 
-	private SimpleModel extractModel(Model model, int length) {
-		SimpleModel result = new SimpleModel();
+	private SmtLib2Model extractModel(Model model, int length) {
+		Map<String, Type> varTypes = new HashMap<>();
 		for (int i = -1; i < length; i++) {
 			for (VarDecl vd : varDecls) {
 				String name = vd.id + StreamIndex.getSuffix(i);
-				Term evaluated = model.evaluate(script.term(name));
-				Value value = SmtInterpolUtil.getValue(evaluated, vd.type);
-				result.putValue(name, value);
+				varTypes.put(name, vd.type);
 			}
 		}
 
-		return result;
+		return SmtLib2Solver.parseSmtLib2Model(model.toString(), varTypes, functions);
 	}
 
 	public void comment(String comment) {

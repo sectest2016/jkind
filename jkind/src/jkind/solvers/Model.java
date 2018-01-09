@@ -47,6 +47,7 @@ public abstract class Model {
 	}
 
 	public Value evaluateFunction(String name, List<Value> inputs) {
-		return functionTables.get(name).lookup(inputs);
+		FunctionTable functionTable = functionTables.get(name);
+		return functionTable.lookup(inputs);
 	}
 }

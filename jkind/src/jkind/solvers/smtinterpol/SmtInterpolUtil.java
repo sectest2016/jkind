@@ -1,13 +1,9 @@
 package jkind.solvers.smtinterpol;
 
 import java.io.FileNotFoundException;
-import java.math.BigInteger;
 import java.util.List;
 
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.LoggingScript;
-import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -20,16 +16,10 @@ import jkind.lustre.NamedType;
 import jkind.lustre.SubrangeIntType;
 import jkind.lustre.Type;
 import jkind.lustre.VarDecl;
-import jkind.lustre.values.BooleanValue;
-import jkind.lustre.values.IntegerValue;
-import jkind.lustre.values.RealValue;
-import jkind.lustre.values.Value;
 import jkind.sexp.Cons;
 import jkind.sexp.Sexp;
 import jkind.sexp.Symbol;
-import jkind.util.BigFraction;
 import jkind.util.SexpUtil;
-import jkind.util.Util;
 
 public class SmtInterpolUtil {
 	public static Script getScript(String scratchBase) {
@@ -107,51 +97,6 @@ public class SmtInterpolUtil {
 		}
 
 		return script.term(text);
-	}
-
-	public static Value getValue(Term term, Type type) {
-		if (term instanceof ApplicationTerm) {
-			return getValue((ApplicationTerm) term);
-		} else if (term instanceof ConstantTerm) {
-			return getValue((ConstantTerm) term, type);
-		} else {
-			throw new JKindException("Unhandled term type: " + term.getClass().getSimpleName());
-		}
-	}
-
-	private static Value getValue(ApplicationTerm at) {
-		String name = at.getFunction().getName();
-		switch (name) {
-		case "true":
-			return BooleanValue.TRUE;
-
-		case "false":
-			return BooleanValue.FALSE;
-
-		default:
-			throw new JKindException("Unhandled function in term to value conversion: " + name);
-		}
-	}
-
-	private static Value getValue(ConstantTerm ct, Type type) {
-		String typeName = Util.getName(type);
-
-		if (ct.getValue() instanceof Rational) {
-			Rational rational = (Rational) ct.getValue();
-			switch (typeName) {
-			case "int":
-				if (rational.denominator().equals(BigInteger.ONE)) {
-					return new IntegerValue(rational.numerator());
-				} else {
-					throw new JKindException("Cannot convert rational to integer: " + rational);
-				}
-
-			case "real":
-				return new RealValue(new BigFraction(rational.numerator(), rational.denominator()));
-			}
-		}
-
-		throw new JKindException("Unhandled constant in term to value conversion: " + ct);
 	}
 
 	public static Sort[] getSorts(Script script, List<VarDecl> vars) {
