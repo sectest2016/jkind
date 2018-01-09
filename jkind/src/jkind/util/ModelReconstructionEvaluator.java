@@ -3,6 +3,7 @@ package jkind.util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jkind.JKindException;
 import jkind.lustre.BinaryExpr;
@@ -25,8 +26,10 @@ import jkind.solvers.SimpleModel;
 import jkind.translation.Specification;
 
 public class ModelReconstructionEvaluator extends Evaluator {
-	public static Model reconstruct(Specification spec, Model model, String property, int k, boolean concrete) {
-		ModelReconstructionEvaluator eval = new ModelReconstructionEvaluator(spec, model, concrete);
+	public static Model reconstruct(Specification userSpec, Specification analysisSpec, Model model, String property,
+			int k, boolean concrete) {
+		Set<String> inlinedVariables = Util.setDifference(userSpec.typeMap.keySet(), analysisSpec.typeMap.keySet());
+		ModelReconstructionEvaluator eval = new ModelReconstructionEvaluator(userSpec, inlinedVariables, model, concrete);
 		eval.reconstructValues(property, k);
 		return eval.model;
 	}
@@ -35,18 +38,21 @@ public class ModelReconstructionEvaluator extends Evaluator {
 	private final Model originalModel;
 	private final SimpleModel model;
 	private final boolean concrete;
+	private final Set<String> inlinedVariables;
 
 	private final Map<String, Expr> equations = new HashMap<>();
 
 	private int step;
 
-	private ModelReconstructionEvaluator(Specification spec, Model originalModel, boolean concrete) {
-		this.spec = spec;
+	private ModelReconstructionEvaluator(Specification userSpec, Set<String> inlinedVariables, Model originalModel,
+			boolean concrete) {
+		this.spec = userSpec;
+		this.inlinedVariables = inlinedVariables;
 		this.originalModel = originalModel;
-		this.model = new SimpleModel(spec.functions);
+		this.model = new SimpleModel(userSpec.functions);
 		this.concrete = concrete;
 
-		for (Equation eq : spec.node.equations) {
+		for (Equation eq : userSpec.node.equations) {
 			equations.put(eq.lhs.get(0).id, eq.expr);
 		}
 	}
@@ -93,19 +99,19 @@ public class ModelReconstructionEvaluator extends Evaluator {
 			}
 		} else {
 			// Equation variable
-			if (step < 0) {
+			if (step >= 0 || inlinedVariables.contains(e.id)) {
+				value = eval(expr);
+			} else {
 				value = originalModel.getValue(si);
 				if (value == null) {
 					value = getDefaultValue(si);
 				}
-			} else {
-				value = eval(expr);
-				if (value == null) {
-					throw new JKindException("Unable to reconstruct counterexample: evaluation failed");
-				}
 			}
 		}
 
+		if (value == null) {
+			throw new JKindException("Unable to reconstruct counterexample: variable has null value");
+		}
 		model.putValue(si, value);
 		return value;
 	}
@@ -148,7 +154,7 @@ public class ModelReconstructionEvaluator extends Evaluator {
 	public Value visit(FunctionCallExpr e) {
 		String name = SexpUtil.encodeFunction(e.function);
 		List<Value> inputs = visitExprs(e.args);
-		
+
 		Value output = model.evaluateFunction(name, inputs);
 		if (output == null) {
 			output = originalModel.evaluateFunction(name, inputs);

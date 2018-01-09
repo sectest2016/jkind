@@ -29,8 +29,11 @@ public class SmtLib2Model extends Model {
 
 	@Override
 	public Value getValue(String name) {
-		Sexp sexp = values.get(name);
 		Type type = varTypes.get(name);
+		if (type == null) {
+			return null;
+		}
+		Sexp sexp = values.get(name);
 		if (sexp == null) {
 			return Util.getDefaultValue(type);
 		}

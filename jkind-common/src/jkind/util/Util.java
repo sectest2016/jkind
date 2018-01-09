@@ -186,7 +186,7 @@ public class Util {
 		}
 		return value;
 	}
-	
+
 	private static Element getElement(Element element, String name, int index) {
 		return (Element) element.getElementsByTagName(name).item(index);
 	}
@@ -305,6 +305,12 @@ public class Util {
 		TreeSet<String> set = new TreeSet<>(new StringNaturalOrdering());
 		set.addAll(original);
 		return Collections.unmodifiableSet(set);
+	}
+
+	public static <T> Set<T> setDifference(Collection<T> c1, Collection<T> c2) {
+		Set<T> result = new HashSet<>(c1);
+		result.removeAll(c2);
+		return result;
 	}
 
 	public static List<EnumType> getEnumTypes(List<TypeDef> types) {

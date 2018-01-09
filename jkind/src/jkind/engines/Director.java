@@ -483,7 +483,7 @@ public class Director extends MessageHandler {
 
 	private Counterexample extractCounterexample(String property, int k, Model model,
 			boolean concrete) {
-		model = ModelReconstructionEvaluator.reconstruct(userSpec, model, property, k, concrete);
+		model = ModelReconstructionEvaluator.reconstruct(userSpec, analysisSpec, model, property, k, concrete);
 		return CounterexampleExtractor.extract(userSpec, k, model);
 	}
 }
