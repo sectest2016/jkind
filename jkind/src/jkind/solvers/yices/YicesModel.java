@@ -38,8 +38,11 @@ public class YicesModel extends Model {
 
 	@Override
 	public Value getValue(String name) {
-		Value value = values.get(getAlias(name));
 		Type type = varTypes.get(name);
+		if (type == null) {
+			throw new IllegalArgumentException("Model queried unknown variable: " + name);
+		}
+		Value value = values.get(getAlias(name));
 		if (value == null) {
 			return Util.getDefaultValue(type);
 		} else {

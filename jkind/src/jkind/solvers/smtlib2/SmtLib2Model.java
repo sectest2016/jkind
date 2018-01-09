@@ -31,7 +31,7 @@ public class SmtLib2Model extends Model {
 	public Value getValue(String name) {
 		Type type = varTypes.get(name);
 		if (type == null) {
-			throw new IllegalArgumentException("Model queried unknown variable");
+			throw new IllegalArgumentException("Model queried unknown variable: " + name);
 		}
 		Sexp sexp = values.get(name);
 		if (sexp == null) {

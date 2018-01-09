@@ -102,13 +102,12 @@ public class ModelReconstructionEvaluator extends Evaluator {
 			}
 		} else {
 			// Equation variable
-			// 1. If there is an algebraic loop, we must refer to the model
-			// 2. If the variable is inlined, we must evaluated it since the
-			// model knows nothing about it
-			// 3. Otherwise, evaluate it when possible (i.e. step >= 0)
-			boolean algebraicLoop = evaluating.contains(si);
-			boolean isInlined = inlinedVariables.contains(e.id);
-			if (!algebraicLoop && (step >= 0 || isInlined)) {
+			if (inlinedVariables.contains(e.id)) {
+				// Inlined variables are always evaluated, ignoring any
+				// restrictions on loops since the model knows nothing about
+				// such variables
+				value = eval(expr);
+			} else if (step >= 0 && !evaluating.contains(si)) {
 				evaluating.add(si);
 				value = eval(expr);
 				evaluating.remove(si);
