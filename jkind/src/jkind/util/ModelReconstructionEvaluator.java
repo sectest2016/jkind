@@ -1,6 +1,7 @@
 package jkind.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +30,8 @@ public class ModelReconstructionEvaluator extends Evaluator {
 	public static Model reconstruct(Specification userSpec, Specification analysisSpec, Model model, String property,
 			int k, boolean concrete) {
 		Set<String> inlinedVariables = Util.setDifference(userSpec.typeMap.keySet(), analysisSpec.typeMap.keySet());
-		ModelReconstructionEvaluator eval = new ModelReconstructionEvaluator(userSpec, inlinedVariables, model, concrete);
+		ModelReconstructionEvaluator eval = new ModelReconstructionEvaluator(userSpec, inlinedVariables, model,
+				concrete);
 		eval.reconstructValues(property, k);
 		return eval.model;
 	}
@@ -41,6 +43,7 @@ public class ModelReconstructionEvaluator extends Evaluator {
 	private final Set<String> inlinedVariables;
 
 	private final Map<String, Expr> equations = new HashMap<>();
+	private final Set<StreamIndex> evaluating = new HashSet<>();
 
 	private int step;
 
@@ -99,8 +102,16 @@ public class ModelReconstructionEvaluator extends Evaluator {
 			}
 		} else {
 			// Equation variable
-			if (step >= 0 || inlinedVariables.contains(e.id)) {
+			// 1. If there is an algebraic loop, we must refer to the model
+			// 2. If the variable is inlined, we must evaluated it since the
+			// model knows nothing about it
+			// 3. Otherwise, evaluate it when possible (i.e. step >= 0)
+			boolean algebraicLoop = evaluating.contains(si);
+			boolean isInlined = inlinedVariables.contains(e.id);
+			if (!algebraicLoop && (step >= 0 || isInlined)) {
+				evaluating.add(si);
 				value = eval(expr);
+				evaluating.remove(si);
 			} else {
 				value = originalModel.getValue(si);
 				if (value == null) {
